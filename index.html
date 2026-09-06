@@ -134,17 +134,52 @@
   }
 
   .card-banner {
-    display: block;
+    display: flex;
+    aspect-ratio: 2 / 1;
+    background: #3E8B89;
     margin: calc(var(--card-pad) * -1) calc(var(--card-pad) * -1) 22px;
     border-radius: var(--radius) var(--radius) 0 0;
     overflow: hidden;
-    line-height: 0;
   }
-  .card-banner svg {
+  .banner-owl {
+    width: 50%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 38%;
     display: block;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 2 / 1;
+    flex-shrink: 0;
+  }
+  .banner-text {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 clamp(12px, 4vw, 28px);
+    min-width: 0;
+  }
+  .banner-word {
+    font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    font-weight: 700;
+    font-size: clamp(1.3rem, 6vw, 2.4rem);
+    color: #F4F2E8;
+    margin: 0 0 8px;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+  .banner-rule {
+    display: block;
+    width: 44%;
+    height: 4px;
+    background: #C4872F;
+    border-radius: 2px;
+    margin-bottom: 10px;
+  }
+  .banner-tag {
+    font-family: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', sans-serif;
+    font-size: clamp(0.55rem, 2.2vw, 0.78rem);
+    letter-spacing: 0.08em;
+    color: #C9CFC2;
+    margin: 0;
   }
 
   .view {
@@ -720,34 +755,12 @@
     stage.innerHTML = `
       <div class="card view">
         <div class="card-banner">
-          <svg viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="更年期ラボ AMSスコア セルフチェック">
-            <defs>
-              <linearGradient id="bannerBg" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#1F3A34"/>
-                <stop offset="100%" stop-color="#274941"/>
-              </linearGradient>
-              <linearGradient id="bannerFlask" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#DDA149"/>
-                <stop offset="100%" stop-color="#B9791F"/>
-              </linearGradient>
-              <radialGradient id="bannerGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#C4872F" stop-opacity="0.35"/>
-                <stop offset="100%" stop-color="#C4872F" stop-opacity="0"/>
-              </radialGradient>
-            </defs>
-            <rect width="1200" height="600" fill="url(#bannerBg)"/>
-            <circle cx="290" cy="330" r="230" fill="url(#bannerGlow)"/>
-            <g transform="translate(290,330) rotate(-7) scale(0.95)">
-              <path d="M-16,-225 L16,-225 L16,-100 L160,150 Q0,215 -160,150 L-16,-100 Z" fill="url(#bannerFlask)" stroke="#8F611D" stroke-width="3" stroke-linejoin="round"/>
-              <circle cx="-55" cy="95" r="15" fill="#F4F2E8" opacity="0.5"/>
-              <circle cx="20" cy="35" r="10" fill="#F4F2E8" opacity="0.65"/>
-              <circle cx="75" cy="105" r="20" fill="#F4F2E8" opacity="0.5"/>
-              <circle cx="-10" cy="150" r="24" fill="#F4F2E8" opacity="0.35"/>
-            </g>
-            <text x="560" y="300" font-family="'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',serif" font-weight="700" font-size="72" fill="#F4F2E8">更年期ラボ</text>
-            <rect x="562" y="320" width="230" height="5" rx="2.5" fill="#C4872F"/>
-            <text x="562" y="368" font-family="'Zen Kaku Gothic New','Hiragino Kaku Gothic ProN',sans-serif" font-size="23" letter-spacing="3" fill="#C9CFC2">AMS SCORE SELF CHECK</text>
-          </svg>
+          <img class="banner-owl" src="owl.jpg" alt="更年期ラボ">
+          <div class="banner-text">
+            <p class="banner-word">更年期ラボ</p>
+            <span class="banner-rule"></span>
+            <p class="banner-tag">AMS SCORE SELF CHECK</p>
+          </div>
         </div>
         <p class="eyebrow">AMSスコア セルフチェック</p>
         <h1 class="start-title serif">男性更年期<br>セルフチェック</h1>
