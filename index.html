@@ -401,6 +401,54 @@
     margin-bottom: 8px;
   }
 
+  .note-intro {
+    font-size: 0.92rem;
+    line-height: 1.8;
+    margin: 0 0 14px;
+  }
+  .note-card {
+    display: block;
+    background: var(--surface-2);
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--text);
+    margin-bottom: 8px;
+    transition: transform 0.15s ease;
+  }
+  .note-card:hover { transform: translateY(-1px); }
+  .note-card-img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1.91 / 1;
+    object-fit: cover;
+    background: var(--border);
+  }
+  .note-card-body {
+    padding: 14px 16px 16px;
+  }
+  .note-card-eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    margin: 0 0 6px;
+  }
+  .note-card-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.6;
+    margin: 0 0 10px;
+    text-wrap: balance;
+  }
+  .note-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
   .affiliate-section {
     margin-top: 32px;
     padding-top: 26px;
@@ -499,23 +547,66 @@
 <script>
   /* ============================================================
      編集ガイド（公開前にここだけ書き換えればOK）
-     - noteUrl: 結果画面から誘導するnoteのURL（アカウントURL or 記事URL）
      - xUrl: Xのプロフィール等のURL。空文字なら結果画面に出ません
-     - affiliateProducts: 診断カテゴリ（none/mild/moderate/severe）ごとに
-       紹介したい商品を配列で追加。空配列のカテゴリは紹介欄ごと非表示になります。
-       1件の例: { name: '商品名', description: '説明文（40字程度目安）',
-                  imageUrl: '', url: 'https://example.com/?affid=xxx' }
-       ※商品紹介文は薬機法・景品表示法の対象になります。「治る」「改善する」等の
-         断定表現は避け、PR表記が必要な場合は明記してください。
+     - RESULT_CONTENT: 診断カテゴリ（none/mild/moderate/severe）ごとに
+       ・note: 誘導したい記事（url / title / image=見出し画像URL）
+       ・intro: 記事へ誘導する一言（結果に応じた案内文）
+       ・products: 紹介したい商品の配列。空配列なら紹介欄ごと非表示になります。
+         1件の例: { name: '商品名', description: '説明文', url: 'https://example.com/?affid=xxx' }
+       ※商品紹介文は薬機法・景品表示法の対象です。「治る」「改善する」等の断定表現は
+         避け、PR表記が必要な場合は明記してください。
      ============================================================ */
   const CONFIG = {
-    noteUrl: 'https://note.com/',
-    xUrl: '',
-    affiliateProducts: {
-      none: [],
-      mild: [],
-      moderate: [],
-      severe: []
+    xUrl: ''
+  };
+
+  const RESULT_CONTENT = {
+    none: {
+      note: {
+        url: 'https://note.com/ko_nenki_men/n/na1ff2ec485cc?sub_rt=share_sb',
+        title: 'AMSチェック結果「症状なし」の方へ ― 今のうちにできること',
+        image: 'https://assets.st-note.com/production/uploads/images/311028652/rectangle_large_type_2_3f364bc3cb4ce4916de85fa87342495c.png?fit=bounds&quality=85&width=1280'
+      },
+      intro: '同じ「症状なし」の結果だった方に向けて、今のうちにできることをまとめた記事があります。',
+      productsIntro: 'あわせて、日々のコンディションづくりに選ばれている製品はこちらです。',
+      products: [
+        { name: 'ネイチャーメイド スーパーマルチビタミン&ミネラル', description: '毎日の栄養バランスを手軽に整えたい方に選ばれているマルチビタミン&ミネラルです。', url: 'https://amzn.to/4ibc8wZ' }
+      ]
+    },
+    mild: {
+      note: {
+        url: 'https://note.com/ko_nenki_men/n/n8286e0f9a813?sub_rt=share_sb',
+        title: 'AMSチェック結果「軽度」の方へ ― 今日から始める、小さな一歩',
+        image: 'https://assets.st-note.com/production/uploads/images/311031276/rectangle_large_type_2_ef6e07b7ddf572069f13a8378d26531a.png?fit=bounds&quality=85&width=1280'
+      },
+      intro: '「軽度」の結果だった方に向けて、今日から始められる小さな一歩をまとめた記事があります。',
+      productsIntro: 'あわせて、この結果の方に選ばれている製品はこちらです。',
+      products: [
+        { name: 'health＋ マグネシウムサプリ', description: '日々のコンディションづくりにマグネシウムを取り入れたい方向けのサプリメントです。', url: 'https://amzn.to/4xlItFm' },
+        { name: 'キューピーコーワ ヒーリング錠', description: 'ビタミンB群などを配合した、疲れが気になるときの栄養補給に使われている製品です。', url: 'https://amzn.to/4gFIxKP' }
+      ]
+    },
+    moderate: {
+      note: {
+        url: 'https://note.com/ko_nenki_men/n/nec3e9f7ef3f0?sub_rt=share_sb',
+        title: 'AMSチェック結果「中等度」の方へ ― まず、数値で確かめてみませんか',
+        image: 'https://assets.st-note.com/production/uploads/images/311032408/rectangle_large_type_2_0a56c605dfa790d9fa33010ede9be4f1.png?fit=bounds&quality=85&width=1280'
+      },
+      intro: '「中等度」の結果だった方には、まず数値で状態を確かめる方法をご紹介しています。',
+      productsIntro: '自宅で目安を調べたい方には、こんな検査キットもあります。',
+      products: [
+        { name: '唾液でできる男性更年期検査キット（テストステロン）', description: '自宅で唾液を採取し、テストステロン値の目安を調べられる検査キットです。結果はあくまで目安のため、詳しい判断は医療機関にご相談ください。', url: 'https://amzn.to/46IkaX3' }
+      ]
+    },
+    severe: {
+      note: {
+        url: 'https://note.com/ko_nenki_men/n/nff9d1fa5fef1?sub_rt=share_sb',
+        title: 'AMSチェック結果「重度」の方へ ― まず、医療機関にご相談ください',
+        image: 'https://assets.st-note.com/production/uploads/images/311032931/rectangle_large_type_2_de71994b9f7deb0360f3802cc80c8d67.png?fit=bounds&quality=85&width=1280'
+      },
+      intro: '「重度」の結果が出た方に向けて、次にとるべき行動をまとめた記事があります。',
+      productsIntro: '',
+      products: []
     }
   };
 
@@ -688,11 +779,12 @@
     const labelMid3 = (b2 + b3) / 2;
     const labelMid4 = (b3 + 100) / 2;
 
-    const products = CONFIG.affiliateProducts[catKey] || [];
+    const content = RESULT_CONTENT[catKey];
+    const products = content.products || [];
     const affiliateHtml = products.length ? `
       <div class="affiliate-section">
         <p class="affiliate-heading">気になる方へ</p>
-        <p class="affiliate-sub">${meta.label}の方向けの関連情報です</p>
+        <p class="affiliate-sub">${content.productsIntro}</p>
         <div class="affiliate-grid">
           ${products.map(p => `
             <a class="affiliate-card" href="${p.url}" target="_blank" rel="noopener sponsored">
@@ -732,10 +824,16 @@
           <span style="left:${labelMid4}%">重度</span>
         </div>
         <p class="result-desc">${meta.desc}</p>
-        <div class="cta-stack">
-          <a class="btn btn-primary" href="${CONFIG.noteUrl}" target="_blank" rel="noopener">noteで更年期障害についてもっと詳しく読む</a>
-          ${CONFIG.xUrl ? `<a class="btn btn-outline" href="${CONFIG.xUrl}" target="_blank" rel="noopener">Xでフォローする</a>` : ''}
-        </div>
+        <p class="note-intro">${content.intro}</p>
+        <a class="note-card" href="${content.note.url}" target="_blank" rel="noopener">
+          <img class="note-card-img" src="${content.note.image}" alt="" loading="lazy">
+          <div class="note-card-body">
+            <p class="note-card-eyebrow">更年期ラボ</p>
+            <p class="note-card-title">${content.note.title}</p>
+            <span class="note-card-cta">続きを読む →</span>
+          </div>
+        </a>
+        ${CONFIG.xUrl ? `<div class="cta-stack"><a class="btn btn-outline" href="${CONFIG.xUrl}" target="_blank" rel="noopener">Xでフォローする</a></div>` : ''}
         ${affiliateHtml}
         <div class="disclaimer">
           本チェックは、厚生労働省「更年期症状・障害に関する意識調査」で紹介されているAMSスコア（男性更年期障害質問票、出典：日本泌尿器科学会／日本Men's Health医学会「LOH症候群診療ガイドライン」検討ワーキング委員会『加齢男性性腺機能低下症候群診療の手引き』）にもとづく自己採点です。医学的な診断ではなく、更年期障害の診断はAMSスコアに加えて医師の診察によって行われます。症状が続く場合や日常生活に支障がある場合は、医療機関を受診してください。
