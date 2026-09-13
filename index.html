@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>男性更年期セルフチェック</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
   :root {
     --bg: #F3F5F7;
@@ -85,6 +85,7 @@
   }
   h1, h2, h3, .serif { font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif; }
   .tnum { font-variant-numeric: tabular-nums; }
+  .mono { font-family: 'JetBrains Mono', 'Zen Kaku Gothic New', ui-monospace, monospace; }
 
   .app {
     min-height: 100vh;
@@ -100,20 +101,37 @@
     margin-bottom: clamp(20px, 5vw, 36px);
   }
   .progress-track {
+    position: relative;
     height: 4px;
     background: var(--surface-2);
     border-radius: 999px;
     overflow: hidden;
   }
   .progress-fill {
+    position: relative;
     height: 100%;
     width: 0%;
     background: var(--accent);
     border-radius: 999px;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 70%, transparent);
     transition: width 0.4s ease;
+    overflow: hidden;
+  }
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 50%, transparent 100%);
+    background-size: 200% 100%;
+    background-position: -100% 0;
+    animation: sweep 1.8s ease-in-out infinite;
+  }
+  @keyframes sweep {
+    to { background-position: 200% 0; }
   }
   @media (prefers-reduced-motion: reduce) {
     .progress-fill { transition: none; }
+    .progress-fill::after { animation: none; display: none; }
   }
 
   .stage {
@@ -275,9 +293,10 @@
     margin-bottom: 6px;
   }
   .q-count {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 500;
+    font-size: 0.82rem;
+    color: var(--accent);
+    font-weight: 700;
+    letter-spacing: 0.04em;
   }
   .back-link {
     background: none;
@@ -358,15 +377,41 @@
     border-radius: 50%;
     background: var(--badge-color);
   }
-  .score-row {
+  .score-readout {
+    position: relative;
     display: flex;
     align-items: baseline;
     gap: 10px;
     margin-bottom: 22px;
+    padding: 16px 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 28px color-mix(in srgb, var(--badge-color, var(--accent)) 20%, transparent);
+  }
+  .score-readout::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 2px;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, var(--badge-color, var(--accent)), transparent);
+    background-size: 60% 100%;
+    background-repeat: no-repeat;
+    background-position: -60% 0;
+    animation: scanline 3s ease-in-out infinite;
+  }
+  @keyframes scanline {
+    to { background-position: 160% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .score-readout::before { animation: none; }
   }
   .score-num {
     font-size: clamp(3rem, 14vw, 4rem);
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1;
   }
   .score-unit {
@@ -374,7 +419,7 @@
     color: var(--text-muted);
   }
   .score-max {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--text-muted);
   }
 
@@ -788,7 +833,7 @@
       <div class="card view">
         <div class="q-head">
           <button class="back-link ${i > 0 ? 'show' : ''}" id="backBtn">← 戻る</button>
-          <span class="q-count tnum">質問 ${i + 1} / ${QUESTIONS.length}</span>
+          <span class="q-count mono tnum">Q.${String(i + 1).padStart(2, '0')} / ${QUESTIONS.length}</span>
         </div>
         <p class="q-text">${QUESTIONS[i]}</p>
         <div class="choices">
@@ -838,39 +883,20 @@
     const labelMid4 = (b3 + 100) / 2;
 
     const content = RESULT_CONTENT[catKey];
-    const products = content.products || [];
-    const affiliateHtml = products.length ? `
-      <div class="affiliate-section">
-        <p class="affiliate-heading">気になる方へ</p>
-        <p class="affiliate-sub">${content.productsIntro}</p>
-        <div class="affiliate-grid">
-          ${products.map(p => `
-            <a class="affiliate-card" href="${p.url}" target="_blank" rel="noopener sponsored">
-              ${p.imageUrl ? `<img class="affiliate-img" src="${p.imageUrl}" alt="">` : `<div class="affiliate-img"></div>`}
-              <div>
-                <p class="affiliate-name">${p.name}</p>
-                <p class="affiliate-desc">${p.description}</p>
-              </div>
-            </a>
-          `).join('')}
-        </div>
-        <p class="affiliate-disclaimer">PR・広告を含みます。効果には個人差があります。</p>
-      </div>
-    ` : '';
 
     stage.innerHTML = `
       <div class="card view">
         <p class="result-kicker">あなたのチェック結果</p>
         <span class="result-badge" style="--badge-color:${meta.color};--badge-soft:${meta.soft}">AMSスコア判定：${meta.label}</span>
-        <div class="score-row">
-          <span class="score-num tnum">${score}</span>
+        <div class="score-readout" style="--badge-color:${meta.color}">
+          <span class="score-num mono tnum">${score}</span>
           <span class="score-unit">点</span>
-          <span class="score-max tnum">/ 85点（${meta.range}）</span>
+          <span class="score-max mono tnum">/ 85点（${meta.range}）</span>
         </div>
         <div class="gauge" style="--b1:${b1}%;--b2:${b2}%;--b3:${b3}%">
           <div class="gauge-marker" style="--pos:${pos}%"></div>
         </div>
-        <div class="gauge-ticks tnum">
+        <div class="gauge-ticks mono tnum">
           <span style="left:${b1}%">26</span>
           <span style="left:${b2}%">36</span>
           <span style="left:${b3}%">49</span>
@@ -892,7 +918,6 @@
           </div>
         </a>
         ${CONFIG.xUrl ? `<div class="cta-stack"><a class="btn btn-outline" href="${CONFIG.xUrl}" target="_blank" rel="noopener">Xでフォローする</a></div>` : ''}
-        ${affiliateHtml}
         <div class="disclaimer">
           本チェックは、厚生労働省「更年期症状・障害に関する意識調査」で紹介されているAMSスコア（男性更年期障害質問票、出典：日本泌尿器科学会／日本Men's Health医学会「LOH症候群診療ガイドライン」検討ワーキング委員会『加齢男性性腺機能低下症候群診療の手引き』）にもとづく自己採点です。医学的な診断ではなく、更年期障害の診断はAMSスコアに加えて医師の診察によって行われます。症状が続く場合や日常生活に支障がある場合は、医療機関を受診してください。
           <br><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/undou/index_00009.html" target="_blank" rel="noopener">出典を見る（厚生労働省）</a>
