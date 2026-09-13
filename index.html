@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>男性更年期セルフチェック</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <style>
   :root {
@@ -276,6 +277,16 @@
     border: 1.5px solid var(--border);
   }
   .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-share {
+    background: var(--text);
+    color: var(--bg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-share:hover { filter: brightness(1.15); }
+  .btn-share svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
 
   .note-block {
     margin-top: 22px;
@@ -344,12 +355,28 @@
   }
   .choice:hover { border-color: var(--accent); }
   .choice:active { transform: scale(0.99); }
+  .choice.selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .choice.selected::after {
+    content: '✓';
+    margin-left: auto;
+    color: var(--accent);
+    font-weight: 700;
+  }
   .choice-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
     flex-shrink: 0;
     background: var(--dot-color);
+  }
+  .key-hint {
+    margin: 14px 0 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
   }
 
   /* ---- Result screen ---- */
@@ -444,6 +471,10 @@
     border-radius: 2px;
     left: var(--pos);
     transform: translateX(-1.5px);
+    transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gauge-marker { transition: none; }
   }
   .gauge-ticks {
     position: relative;
@@ -816,7 +847,7 @@
           <span class="meta-chip">1問ずつ回答</span>
         </div>
         <button class="btn btn-primary" id="startBtn">チェックをはじめる</button>
-        <p class="note-block">本チェックは医学的診断ではありません。結果はご自身の状態を知るための目安としてご活用ください。<br>出典：<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/undou/index_00009.html" target="_blank" rel="noopener">厚生労働省「更年期症状・障害に関する意識調査」</a></p>
+        <p class="note-block">本チェックは医学的診断ではありません。結果はご自身の状態を知るための目安としてご活用ください。回答内容はどこにも送信・保存されず、この画面内だけで完結します。<br>出典：<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/undou/index_00009.html" target="_blank" rel="noopener">厚生労働省「更年期症状・障害に関する意識調査」</a></p>
       </div>
     `;
     document.getElementById('startBtn').addEventListener('click', () => {
@@ -838,11 +869,12 @@
         <p class="q-text">${QUESTIONS[i]}</p>
         <div class="choices">
           ${CHOICES.map((c, idx) => `
-            <button class="choice" data-value="${c.value}" style="--dot-color:${'var(' + SCALE_VARS[idx] + ')'}">
+            <button class="choice ${state.answers[i] === c.value ? 'selected' : ''}" data-value="${c.value}" style="--dot-color:${'var(' + SCALE_VARS[idx] + ')'}">
               <span class="choice-dot"></span>${c.label}
             </button>
           `).join('')}
         </div>
+        <p class="key-hint">PCでは数字キー（1〜5）でも回答できます</p>
       </div>
     `;
     if (i > 0) {
@@ -865,6 +897,15 @@
     });
   }
 
+  document.addEventListener('keydown', (e) => {
+    if (state.screen !== 'question') return;
+    const n = Number(e.key);
+    if (n >= 1 && n <= 5) {
+      const btn = stage.querySelector(`.choice[data-value="${n}"]`);
+      if (btn) btn.click();
+    }
+  });
+
   function renderResult() {
     setProgress(1);
     const score = state.answers.reduce((sum, v) => sum + v, 0);
@@ -883,6 +924,10 @@
     const labelMid4 = (b3 + 100) / 2;
 
     const content = RESULT_CONTENT[catKey];
+
+    const shareUrl = location.href.split('#')[0].split('?')[0];
+    const shareText = `AMSスコアチェックの結果は「${meta.label}」（${score}点）でした。\n更年期の状態を2分でセルフチェック👇`;
+    const shareHref = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
 
     stage.innerHTML = `
       <div class="card view">
@@ -908,6 +953,12 @@
           <span style="left:${labelMid4}%">重度</span>
         </div>
         <p class="result-desc">${meta.desc}</p>
+        <div class="cta-stack">
+          <a class="btn btn-share" href="${shareHref}" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231ZM17.083 19.77h1.833L7.084 4.126H5.117Z"/></svg>
+            Xで結果をシェアする
+          </a>
+        </div>
         <p class="note-intro">${content.intro}</p>
         <a class="note-card" href="${content.note.url}" target="_blank" rel="noopener">
           <img class="note-card-img" src="${content.note.image}" alt="" loading="lazy">
@@ -932,6 +983,30 @@
       state.qIndex = 0;
       state.answers = new Array(QUESTIONS.length).fill(null);
       render();
+    });
+    animateResultReveal(score, pos);
+  }
+
+  function animateResultReveal(finalScore, finalPos) {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const numEl = document.querySelector('.score-num');
+    const marker = document.querySelector('.gauge-marker');
+    if (reduceMotion || !numEl) return;
+    numEl.textContent = '0';
+    if (marker) marker.style.setProperty('--pos', '0%');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (marker) marker.style.setProperty('--pos', finalPos + '%');
+        const duration = 700;
+        const start = performance.now();
+        function tick(now) {
+          const t = Math.min(1, (now - start) / duration);
+          const eased = 1 - Math.pow(1 - t, 3);
+          numEl.textContent = Math.round(eased * finalScore);
+          if (t < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
     });
   }
 
