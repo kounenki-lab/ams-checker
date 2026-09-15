@@ -125,7 +125,7 @@
     background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 50%, transparent 100%);
     background-size: 200% 100%;
     background-position: -100% 0;
-    animation: sweep 1.8s ease-in-out infinite;
+    animation: sweep 3.2s ease-in-out infinite;
   }
   @keyframes sweep {
     to { background-position: 200% 0; }
@@ -295,6 +295,13 @@
     color: var(--text-muted);
   }
   .note-block a { color: var(--text-muted); }
+  .privacy-note {
+    margin: 0 0 14px;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    text-align: center;
+  }
 
   /* ---- Question screen ---- */
   .q-head {
@@ -322,6 +329,15 @@
   .back-link.show { visibility: visible; }
   .back-link:hover { color: var(--accent); }
 
+  .q-disclaimer {
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    background: var(--surface-2);
+    border-radius: 8px;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
   .q-text {
     font-size: clamp(1.2rem, 4.4vw, 1.5rem);
     line-height: 1.7;
@@ -415,26 +431,6 @@
     border: 1px solid var(--border);
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 0 28px color-mix(in srgb, var(--badge-color, var(--accent)) 20%, transparent);
-  }
-  .score-readout::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 2px;
-    width: 100%;
-    background: linear-gradient(90deg, transparent, var(--badge-color, var(--accent)), transparent);
-    background-size: 60% 100%;
-    background-repeat: no-repeat;
-    background-position: -60% 0;
-    animation: scanline 3s ease-in-out infinite;
-  }
-  @keyframes scanline {
-    to { background-position: 160% 0; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .score-readout::before { animation: none; }
   }
   .score-num {
     font-size: clamp(3rem, 14vw, 4rem);
@@ -683,7 +679,8 @@
          避け、PR表記が必要な場合は明記してください。
      ============================================================ */
   const CONFIG = {
-    xUrl: ''
+    xUrl: '',
+    bannerImage: 'owl.jpg'
   };
 
   const RESULT_CONTENT = {
@@ -831,7 +828,7 @@
     stage.innerHTML = `
       <div class="card view">
         <div class="card-banner">
-          <img class="banner-owl" src="owl.jpg" alt="更年期ラボ">
+          <img class="banner-owl" src="${CONFIG.bannerImage}" alt="更年期ラボ">
           <div class="banner-text">
             <p class="banner-word">更年期ラボ</p>
             <span class="banner-rule"></span>
@@ -846,8 +843,9 @@
           <span class="meta-chip">所要時間 約2分</span>
           <span class="meta-chip">1問ずつ回答</span>
         </div>
+        <p class="privacy-note">回答内容はどこにも送信・保存されません。途中でやめても構いません。</p>
         <button class="btn btn-primary" id="startBtn">チェックをはじめる</button>
-        <p class="note-block">本チェックは医学的診断ではありません。結果はご自身の状態を知るための目安としてご活用ください。回答内容はどこにも送信・保存されず、この画面内だけで完結します。<br>出典：<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/undou/index_00009.html" target="_blank" rel="noopener">厚生労働省「更年期症状・障害に関する意識調査」</a></p>
+        <p class="note-block">本チェックは医学的診断ではありません。結果はご自身の状態を知るための目安としてご活用ください。<br>出典：<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/kenkou/undou/index_00009.html" target="_blank" rel="noopener">厚生労働省「更年期症状・障害に関する意識調査」</a></p>
       </div>
     `;
     document.getElementById('startBtn').addEventListener('click', () => {
@@ -866,6 +864,7 @@
           <button class="back-link ${i > 0 ? 'show' : ''}" id="backBtn">← 戻る</button>
           <span class="q-count mono tnum">Q.${String(i + 1).padStart(2, '0')} / ${QUESTIONS.length}</span>
         </div>
+        ${i === 14 ? `<p class="q-disclaimer">以下2問は、国際的に使用されているAMSスコア問診票に含まれる項目です。個人の詮索を目的としたものではなく、医学的な評価の一部としてお尋ねしています。回答内容はこの画面内だけで完結し、どこにも送信・保存されません。</p>` : ''}
         <p class="q-text">${QUESTIONS[i]}</p>
         <div class="choices">
           ${CHOICES.map((c, idx) => `
@@ -931,9 +930,9 @@
 
     stage.innerHTML = `
       <div class="card view">
-        <p class="result-kicker">あなたのチェック結果</p>
-        <span class="result-badge" style="--badge-color:${meta.color};--badge-soft:${meta.soft}">AMSスコア判定：${meta.label}</span>
-        <div class="score-readout" style="--badge-color:${meta.color}">
+        <p class="result-kicker">今のあなたの状態</p>
+        <span class="result-badge" style="--badge-color:${meta.color};--badge-soft:${meta.soft}">AMSスコアの傾向：${meta.label}</span>
+        <div class="score-readout">
           <span class="score-num mono tnum">${score}</span>
           <span class="score-unit">点</span>
           <span class="score-max mono tnum">/ 85点（${meta.range}）</span>
